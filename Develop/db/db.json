@@ -1,18 +1,7 @@
 [
   {
-    "title": "Test Title",
-    "text": "Test text"
-  },
-  {
-    "title": "Ian Anderson's Notes!",
-    "text": "This is my first note, dude!"
-  },
-  {
-    "title": "This is now my second note!",
-    "text": "Hi again."
-  },
-  {
-    "title": "Still working?",
-    "text": "Ok, looks like it might be!"
+    "title": "Ian Anderson's Notes",
+    "text": "Hi there, this is my first note that I'm hoping to save to my note-taker app.",
+    "id": 1
   }
 ]

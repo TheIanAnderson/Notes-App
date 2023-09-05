@@ -32,6 +32,12 @@ app.get("/api/notes", async (req, res) => {
   }
 });
 
+function generateUniqueId(notes) {
+  // Find the highest existing ID and add 1
+  const maxId = notes.reduce((max, note) => (note.id > max ? note.id : max), 0);
+  return maxId + 1;
+}
+
 // Create a new note and save it to db/db.json
 app.post("/api/notes", async (req, res) => {
   try {
@@ -40,7 +46,7 @@ app.post("/api/notes", async (req, res) => {
 
     const newNote = req.body;
     // Generate a unique ID for the new note, save it, and update db/db.json
-    newNote.id = generateUniqueId();
+    newNote.id = generateUniqueId(notes);
     notes.push(newNote);
 
     await fs.writeFile("db/db.json", JSON.stringify(notes, null, 2), "utf8");
@@ -50,32 +56,6 @@ app.post("/api/notes", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
-
-// Delete a note by ID from db.json
-app.delete("/api/notes/:id", async (req, res) => {
-  try {
-    const data = await fs.readFile("db/db.json", "utf8");
-    const notes = JSON.parse(data);
-
-    const noteIdToDelete = req.params.id;
-    const updatedNotes = notes.filter((note) => note.id !== noteIdToDelete);
-
-    await fs.writeFile(
-      "db/db.json",
-      JSON.stringify(updatedNotes, null, 2),
-      "utf8"
-    );
-    res.status(204).send();
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error");
-  }
-});
-
-function generateUniqueId() {
-  // Implement a function to generate unique IDs for notes
-  // This can be based on timestamps, random numbers, or other strategies
-}
 
 // app.use(routes);
 
