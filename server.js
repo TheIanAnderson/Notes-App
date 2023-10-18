@@ -1,64 +1,33 @@
-const path = require("path");
+//Imports Node packages 
 const express = require("express");
-const app = express();
-const routes = require("./Controllers");
-const bodyParser = require("body-parser");
-const fs = require("fs/promises"); // const sequelize = require("./config/connection");
-const PORT = 3001;
+const path = require("path");
 
+//Imports router
+const api = require('./routes/index')
+
+//Initialize Express and the PORT the server will run
+const app = express();
+const PORT = process.env.PORT || 3001;
+
+//Middleware for parsing JSON and urlencoded form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, "public")));
-app.use(bodyParser.json());
+
+//Static assets from public folder
+app.use(express.static("public"));
+
+//GET routes
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public/index.html"));
+});
+
 app.get("/notes", (req, res) => {
-  res.sendFile(path.join(__dirname, "public/api/notes.html"));
+  res.sendFile(path.join(__dirname, "public/notes.html"));
 });
 
-app.post("/api/notes.html", (req, res) => {
-  const noteData = req.body;
-  const newNote = { id: 1, ...noteData };
-  res.status(201).json(newNote);
-});
-
-// Get all notes from db/db.json
-app.get("/api/notes", async (req, res) => {
-  try {
-    const data = await fs.readFile("db/db.json", "utf8");
-    const notes = JSON.parse(data);
-    res.json(notes);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error");
-  }
-});
-
-function generateUniqueId(notes) {
-  // Find the highest existing ID and add 1
-  const maxId = notes.reduce((max, note) => (note.id > max ? note.id : max), 0);
-  return maxId + 1;
-}
-
-// Create a new note and save it to db/db.json
-app.post("/api/notes", async (req, res) => {
-  try {
-    const data = await fs.readFile("db/db.json", "utf8");
-    const notes = JSON.parse(data);
-
-    const newNote = req.body;
-    // Generate a unique ID for the new note, save it, and update db/db.json
-    newNote.id = generateUniqueId(notes);
-    notes.push(newNote);
-
-    await fs.writeFile("db/db.json", JSON.stringify(notes, null, 2), "utf8");
-    res.status(201).json(newNote);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Server error");
-  }
-});
-
-// app.use(routes);
+//Sends api requests to index.js in routes folder
+app.use('/api',api)
 
 app.listen(PORT, () => {
-  console.log("Now listening to localhost 3001");
+  console.log(`application succesfully listening to http://localhost:${PORT}`);
 });
